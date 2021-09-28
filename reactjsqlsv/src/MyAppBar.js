@@ -58,7 +58,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function MyAppBar({ classes, students, handleSelectedClassChange }) {
-    console.log("MyAppBar", classes, students);
+    // console.log("MyAppBar", classes, students);
     const [selectedClass,handleClassChange] = React.useState(0)
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
