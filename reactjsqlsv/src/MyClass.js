@@ -1,11 +1,46 @@
 import "./App.css";
 import React from "react";
 import { DataGrid } from "@mui/x-data-grid";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 // import moment from 'moment';
+import IconButton from "@mui/material/IconButton";
+import Button from '@mui/material/Button';
+
 class MyClass extends React.Component {
   constructor(props) {
     super(props);
     const columns = [
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 150,
+        renderCell: (params) => (
+          <strong>
+            <IconButton
+            size="large"
+            aria-label="show 17 new notifications"
+            color="inherit"
+            onClick={() => this.editRow(params.value)}
+          >
+              <EditIcon />
+            </IconButton>
+            <IconButton
+            size="large"
+            aria-label="show 17 new notifications"
+            color="inherit"
+            onClick={() => this.deleteRow(params.value)}
+          >
+              <DeleteForeverIcon />
+            </IconButton>
+          </strong>
+        ),
+      },
+      {
+        field: "id",
+        headerName: "ID",
+        width: 80,
+      },
       {
         field: "firstName",
         headerName: "Tên",
@@ -48,6 +83,14 @@ class MyClass extends React.Component {
     };
   }
 
+  editRow = (id) => {
+    console.log('editRow',id)
+  }
+
+  deleteRow = (id) => {
+    console.log('deleteRow',id)
+  }
+
   handleClassChange = (selectedClass) => {
     // console.log("MyClass chọn: ", selectedClass);
     this.setState({ selectedClass: selectedClass });
@@ -65,8 +108,10 @@ class MyClass extends React.Component {
     if(props.className && props.newStudent.length>0){
       const students = [...state.students]
       const newStudent = props.newStudent[0]
-      newStudent.id = students.length
+
+      newStudent.id = students.length + 1
       newStudent.className = props.className
+      newStudent.actions = newStudent.id
       students.push(newStudent)
       totalStudents++
       props.handleTotalStudents(totalStudents)
