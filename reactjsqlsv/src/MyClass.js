@@ -1,7 +1,7 @@
 import "./App.css";
 import React from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import moment from 'moment';
+// import moment from 'moment';
 class MyClass extends React.Component {
   constructor(props) {
     super(props);
@@ -40,44 +40,47 @@ class MyClass extends React.Component {
 
     this.state = {
       columns: columns,
-      students: [],
+      students: [], // Ban đầu students của mình là 1 mảng rỗng
+      newStudent: [],
       displayStudents: [],
+      selectedClass:props.selectedClass,
+      className:''
     };
-    console.log("Props.students", props.students);
   }
 
   handleClassChange = (selectedClass) => {
-    console.log("MyClass chọn: ", selectedClass);
+    // console.log("MyClass chọn: ", selectedClass);
     this.setState({ selectedClass: selectedClass });
   };
 
-  componentDidMount() {
-    this.getData();
+  static getDerivedStateFromProps(props,state){
+    if(props.className && props.newStudent.length>0){
+      const students = [...state.students]
+      console.log('students first: ',students) 
+      const newStudent = props.newStudent[0]
+      newStudent.id = students.length
+      newStudent.className = props.className
+      console.log('students[0]',students[0])
+      console.log('MyClass newStudent',newStudent)
+      console.log('MyClass students',students)  
+      students.push(newStudent)
+      console.log(students.length)
+
+      return {selectedClass:props.className,students:students,newStudent:[]}
+    }else{
+      return {selectedClass:props.className}
+    }
   }
 
-  getData = () => {
-    fetch("https://randomuser.me/api/?results=5")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data.results);
-        const dataNew = data.results.map((child, index) => {
-          return {
-            id: index++,
-            firstName: child.name.first,
-            lastName: child.name.last,
-            phone: child.phone,
-            dob:moment(child.dob.date).format('DD/MM/YY'),
-            country:child.location.country,
-            picture:child.picture.medium
-          };
-        });
-        this.setState({ students: dataNew, displayStudents: dataNew });
-      })
-      .catch((err) => console.log(err));
-  };
-
   render() {
-    const displayStudents = [...this.state.students];
+    // console.log('MyClass render students',this.state.students)
+    let displayStudents = [...this.state.students];
+
+    displayStudents = displayStudents.filter((data) => {
+      return data.className === this.state.selectedClass
+    })
+    // console.log('MyClass render displayStudents',displayStudents)
+
     return (
       <div style={{ height: 300, width: "100%" }}>
         <DataGrid rows={displayStudents} columns={this.state.columns} />

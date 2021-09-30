@@ -12,6 +12,7 @@ import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
+import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
@@ -57,14 +58,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function MyAppBar({ classes, students, handleSelectedClassChange }) {
-    // console.log("MyAppBar", classes, students);
-    const [selectedClass,handleClassChange] = React.useState(0)
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+export default function MyAppBar({
+  handleSelectedClassChange,
+  handleAddStudent,
+}) {
+  // console.log("MyAppBar", classes, students);
+  const [selectedClass, handleClassChange] = React.useState(0);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
-    const isMenuOpen = Boolean(anchorEl);
-    const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const isMenuOpen = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -84,8 +88,14 @@ export default function MyAppBar({ classes, students, handleSelectedClassChange 
   };
 
   const handleChange = (selectedClass) => {
-    handleClassChange(selectedClass)
     console.log("MyAppBar chọn: ", selectedClass);
+    handleClassChange(selectedClass);
+    handleSelectedClassChange(selectedClass)
+  };
+
+  const addStudent = () => {
+    // console.log("MyAppBar addStudent");
+    handleAddStudent();
   };
 
   const menuId = "primary-search-account-menu";
@@ -195,6 +205,18 @@ export default function MyAppBar({ classes, students, handleSelectedClassChange 
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <CompoClasses handleChange={handleChange} />
+
+            <IconButton
+              size="large"
+              edge="end"
+              aria-label="account of current user"
+              aria-haspopup="true"
+              onClick={addStudent}
+              color="inherit"
+            >
+              <PersonAddAlt1Icon />
+            </IconButton>
+
             <IconButton
               size="large"
               edge="end"
@@ -204,7 +226,9 @@ export default function MyAppBar({ classes, students, handleSelectedClassChange 
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <AccountCircle />
+              <Badge badgeContent={1} color="error">
+                <AccountCircle />
+              </Badge>
             </IconButton>
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>

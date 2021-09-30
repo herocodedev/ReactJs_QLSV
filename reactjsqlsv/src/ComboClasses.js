@@ -17,8 +17,8 @@ class CompoClasses extends React.Component{
 
   handleChange = (event,value) => {
     console.log('CompoClasses chọn: ',value)
-    this.setState({selectedClass:value?.name})
-    this.props.handleChange(value?.name)
+    this.setState({selectedClass:value ? value.name : ''})
+    this.props.handleChange(value ? value.name : '')
   }
 
 
