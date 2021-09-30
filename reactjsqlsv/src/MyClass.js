@@ -54,20 +54,26 @@ class MyClass extends React.Component {
   };
 
   static getDerivedStateFromProps(props,state){
+    let totalStudents = 0
+    if(!props.className || props.className===''){
+      totalStudents = state.students.length
+    }else{
+      let displayStudents = [...state.students]
+      displayStudents = displayStudents.filter((data) => data.className === props.className)
+      totalStudents = displayStudents.length
+    }
     if(props.className && props.newStudent.length>0){
       const students = [...state.students]
-      console.log('students first: ',students) 
       const newStudent = props.newStudent[0]
       newStudent.id = students.length
       newStudent.className = props.className
-      console.log('students[0]',students[0])
-      console.log('MyClass newStudent',newStudent)
-      console.log('MyClass students',students)  
       students.push(newStudent)
-      console.log(students.length)
-
+      totalStudents++
+      props.handleTotalStudents(totalStudents)
       return {selectedClass:props.className,students:students,newStudent:[]}
     }else{
+      if(props.className !== state.selectedClass)
+        props.handleTotalStudents(totalStudents)
       return {selectedClass:props.className}
     }
   }

@@ -61,9 +61,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function MyAppBar({
   handleSelectedClassChange,
   handleAddStudent,
+  totalStudents
 }) {
   // console.log("MyAppBar", classes, students);
-  const [selectedClass, handleClassChange] = React.useState(0);
+  const [selectedClass, handleClassChange] = React.useState('');
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
@@ -212,6 +213,7 @@ export default function MyAppBar({
               aria-label="account of current user"
               aria-haspopup="true"
               onClick={addStudent}
+              disabled={selectedClass === ''}
               color="inherit"
             >
               <PersonAddAlt1Icon />
@@ -226,7 +228,7 @@ export default function MyAppBar({
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <Badge badgeContent={1} color="error">
+              <Badge badgeContent={totalStudents} color="error">
                 <AccountCircle />
               </Badge>
             </IconButton>
