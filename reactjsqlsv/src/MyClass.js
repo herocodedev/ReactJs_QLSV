@@ -3,10 +3,14 @@ import React from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-// import moment from 'moment';
 import IconButton from "@mui/material/IconButton";
 import Button from '@mui/material/Button';
-
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Snackbar from '@mui/material/Snackbar';
 class MyClass extends React.Component {
   constructor(props) {
     super(props);
@@ -79,7 +83,13 @@ class MyClass extends React.Component {
       newStudent: [],
       displayStudents: [],
       selectedClass:props.selectedClass,
-      className:''
+      className:'',
+      openComfirmation:false,
+      editId:null,
+      totalStudents:0,
+      maxID:1,
+      openSnackbar:false,
+      snackbarInfo:''
     };
   }
 
@@ -89,8 +99,24 @@ class MyClass extends React.Component {
 
   deleteRow = (id) => {
     console.log('deleteRow',id)
+    this.setState({openComfirmation:true,editId:id})
   }
 
+  handleCloseConfirmation = (yes) => {
+    console.log('handleCloseConfirmation',yes) 
+    this.setState({openComfirmation:false})
+    if(yes){
+      let students = [...this.state.students]
+      students = students.filter((data) => data.id !== this.state.editId)
+      const totalStudents = this.state.totalStudents - 1
+      this.setState({students:students,totalStudents:totalStudents,openSnackbar:true,snackbarInfo:'Xóa Sinh Viên Thành Công'})
+      this.props.handleTotalStudents(totalStudents)
+    }
+  }
+
+  handleSnackbarClose = () => {
+    this.setState({openSnackbar:false})
+  }
   handleClassChange = (selectedClass) => {
     // console.log("MyClass chọn: ", selectedClass);
     this.setState({ selectedClass: selectedClass });
@@ -108,18 +134,29 @@ class MyClass extends React.Component {
     if(props.className && props.newStudent.length>0){
       const students = [...state.students]
       const newStudent = props.newStudent[0]
+      let maxId = state.maxID
+      console.log(maxId)
 
-      newStudent.id = students.length + 1
+      newStudent.id = maxId
       newStudent.className = props.className
       newStudent.actions = newStudent.id
       students.push(newStudent)
       totalStudents++
       props.handleTotalStudents(totalStudents)
-      return {selectedClass:props.className,students:students,newStudent:[]}
+      console.log(state.students)
+      return {selectedClass:props.className
+        ,students:students
+        ,newStudent:[]
+        ,totalStudents:totalStudents
+        ,maxID: maxId + 1
+        ,openSnackbar:true
+        ,snackbarInfo:'Thêm sinh viên thành công'  
+      }
+
     }else{
       if(props.className !== state.selectedClass)
         props.handleTotalStudents(totalStudents)
-      return {selectedClass:props.className}
+      return {selectedClass:props.className,totalStudents:totalStudents}
     }
   }
 
@@ -135,6 +172,34 @@ class MyClass extends React.Component {
     return (
       <div style={{ height: 300, width: "100%" }}>
         <DataGrid rows={displayStudents} columns={this.state.columns} />
+        <Dialog
+        open={this.state.openComfirmation}
+        onClose={() => this.handleCloseConfirmation(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Bạn Chắc Chắn Là Xóa Sinh Viên Có ID"} {this.state.editId + ' Này?'} 
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Hành Động Này Không Thể Khôi Phục.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => this.handleCloseConfirmation(false)}>Hủy</Button>
+          <Button onClick={() => this.handleCloseConfirmation(true)} autoFocus>
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        anchorOrigin={{ vertical:'bottom', horizontal:'right' }}
+        open={this.state.openSnackbar}
+        onClose={() => this.handleSnackbarClose()}
+        message={this.state.snackbarInfo}
+        key={{vertical:'bottom', horizontal:'right'}}
+      />
       </div>
     );
   }
