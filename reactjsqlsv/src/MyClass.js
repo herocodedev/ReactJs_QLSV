@@ -11,6 +11,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Snackbar from '@mui/material/Snackbar';
+import Avatar from '@mui/material/Avatar';
+import MuiAlert from '@mui/material/Alert';
 class MyClass extends React.Component {
   constructor(props) {
     super(props);
@@ -18,7 +20,7 @@ class MyClass extends React.Component {
       {
         field: "actions",
         headerName: "Actions",
-        width: 150,
+        width: 120,
         renderCell: (params) => (
           <strong>
             <IconButton
@@ -41,9 +43,12 @@ class MyClass extends React.Component {
         ),
       },
       {
-        field: "id",
-        headerName: "ID",
-        width: 80,
+        field: "picture",
+        headerName: "Avatar",
+        width: 100,
+        renderCell: (params) => (
+          <Avatar alt="Remy Sharp" src={params.value} />
+        ),
       },
       {
         field: "firstName",
@@ -70,11 +75,7 @@ class MyClass extends React.Component {
         headerName: "Quốc gia",
         width: 150,
       },
-      {
-        field: "picture",
-        headerName: "Avatar",
-        width: 150,
-      },
+     
     ];
 
     this.state = {
@@ -85,11 +86,12 @@ class MyClass extends React.Component {
       selectedClass:props.selectedClass,
       className:'',
       openComfirmation:false,
-      editId:null,
+      editStudent:null,
       totalStudents:0,
       maxID:1,
       openSnackbar:false,
-      snackbarInfo:''
+      snackbarInfo:'',
+      severity:'success'
     };
   }
 
@@ -98,8 +100,11 @@ class MyClass extends React.Component {
   }
 
   deleteRow = (id) => {
-    console.log('deleteRow',id)
-    this.setState({openComfirmation:true,editId:id})
+    const editStudent = this.state.students.find(student => student.id === id)
+    console.log('deleteRow',id,editStudent)
+    if(editStudent){
+      this.setState({openComfirmation:true,editStudent:editStudent})
+    }
   }
 
   handleCloseConfirmation = (yes) => {
@@ -107,9 +112,14 @@ class MyClass extends React.Component {
     this.setState({openComfirmation:false})
     if(yes){
       let students = [...this.state.students]
-      students = students.filter((data) => data.id !== this.state.editId)
+      students = students.filter((data) => data.id !== this.state.editStudent.id)
       const totalStudents = this.state.totalStudents - 1
-      this.setState({students:students,totalStudents:totalStudents,openSnackbar:true,snackbarInfo:'Xóa Sinh Viên Thành Công'})
+      this.setState({students:students
+        ,totalStudents:totalStudents
+        ,openSnackbar:true
+        ,snackbarInfo:'Xóa Sinh Viên Thành Công',
+        severity:'success'
+      })
       this.props.handleTotalStudents(totalStudents)
     }
   }
@@ -134,6 +144,7 @@ class MyClass extends React.Component {
     if(props.className && props.newStudent.length>0){
       const students = [...state.students]
       const newStudent = props.newStudent[0]
+      console.log(newStudent)
       let maxId = state.maxID
       console.log(maxId)
 
@@ -179,7 +190,7 @@ class MyClass extends React.Component {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Bạn Chắc Chắn Là Xóa Sinh Viên Có ID"} {this.state.editId + ' Này?'} 
+          {"Bạn Chắc Chắn Là Xóa Sinh Viên Có Tên"} {this.state.editStudent?.firstName + ' Này?'} <Avatar alt="Remy Sharp" src={this.state.editStudent?.picture} /> 
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
@@ -199,7 +210,11 @@ class MyClass extends React.Component {
         onClose={() => this.handleSnackbarClose()}
         message={this.state.snackbarInfo}
         key={{vertical:'bottom', horizontal:'right'}}
-      />
+      >
+          <MuiAlert onClose={() => this.handleSnackbarClose()} severity={this.state.severity} variant="filled" sx={{ width: '100%' }}> 
+          {this.state.snackbarInfo}
+          </MuiAlert>
+      </Snackbar>
       </div>
     );
   }
