@@ -13,6 +13,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Snackbar from '@mui/material/Snackbar';
 import Avatar from '@mui/material/Avatar';
 import MuiAlert from '@mui/material/Alert';
+import TextField from '@mui/material/TextField';
 class MyClass extends React.Component {
   constructor(props) {
     super(props);
@@ -87,28 +88,33 @@ class MyClass extends React.Component {
       className:'',
       openComfirmation:false,
       editStudent:null,
+      editedStudent:null,
       totalStudents:0,
       maxID:1,
       openSnackbar:false,
       snackbarInfo:'',
-      severity:'success'
+      severity:'success',
+      openEditor:false,
     };
   }
 
   editRow = (id) => {
-    console.log('editRow',id)
+    const editStudent = this.state.students.find(student => student.id === id)
+    if(editStudent){
+      this.setState({openEditor:true,editStudent:editStudent,editedStudent:editStudent})
+    }
   }
 
   deleteRow = (id) => {
     const editStudent = this.state.students.find(student => student.id === id)
-    console.log('deleteRow',id,editStudent)
+    // console.log('deleteRow',id,editStudent)
     if(editStudent){
       this.setState({openComfirmation:true,editStudent:editStudent})
     }
   }
 
   handleCloseConfirmation = (yes) => {
-    console.log('handleCloseConfirmation',yes) 
+    // console.log('handleCloseConfirmation',yes) 
     this.setState({openComfirmation:false})
     if(yes){
       let students = [...this.state.students]
@@ -131,6 +137,50 @@ class MyClass extends React.Component {
     // console.log("MyClass chọn: ", selectedClass);
     this.setState({ selectedClass: selectedClass });
   };
+
+  handleCloseEditor = (yes) => {
+    // console.log('handleCloseConfirmation',yes) 
+    this.setState({openEditor:false})
+    if(yes){
+      console.log('HandleCloseConfirmation',this.state.editedStudent)
+      console.log('HandleCloseConfirmation',this.state.editStudent)
+      let students = [...this.state.students]
+      students = students.filter(data => data.id !== this.state.editedStudent.id)
+      students.push(this.state.editedStudent)
+      this.setState({
+        students:students,
+        editedStudent:null,
+        openSnackbar:true,
+        snackbarInfo:'Edit thành công',
+        severity:'success'
+      })
+    }else{
+      this.setState({
+        editStudent:null,
+        editedStudent:null,
+        openSnackbar:true,
+      })
+    }
+  }
+
+  setFirstNameValue = (event) => {
+    // console.log('setFirstName',event.target.value)
+    const editedStudent = {...this.state.editedStudent}
+    editedStudent.firstName = event.target.value
+    this.setState({editedStudent:editedStudent})
+  }
+
+  setLastNameValue = (event) => {
+    const editedStudent = {...this.state.editedStudent}
+    editedStudent.lastName = event.target.value
+    this.setState({editedStudent:editedStudent})
+  }
+
+  setLastCountryValue = (event) => {
+    const editedStudent = {...this.state.editedStudent}
+    editedStudent.country = event.target.value
+    this.setState({editedStudent:editedStudent})
+  }
 
   static getDerivedStateFromProps(props,state){
     let totalStudents = 0
@@ -215,6 +265,52 @@ class MyClass extends React.Component {
           {this.state.snackbarInfo}
           </MuiAlert>
       </Snackbar>
+      <Dialog open={this.state.openEditor} onClose={() => this.handleCloseEditor(false)}>
+        <DialogTitle>Chỉnh sửa sinh viên</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            To subscribe to this website, please enter your email address here. We
+            will send updates occasionally.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="firstname"
+            label="Tên sinh viên"
+            type="text"
+            onChange = {(e) => this.setFirstNameValue(e)}
+            defaultValue={this.state.editStudent?.firstName}
+            fullWidth
+            variant="standard"
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="lastname"
+            label="Họ"
+            type="text"
+            onChange = {(e) => this.setLastNameValue(e)}
+            defaultValue={this.state.editStudent?.lastName}
+            fullWidth
+            variant="standard"
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="country"
+            label="Quốc Gia"
+            type="text"
+            onChange = {(e) => this.setLastCountryValue(e)}
+            defaultValue={this.state.editStudent?.country}
+            fullWidth
+            variant="standard"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => this.handleCloseEditor(false)}>Cancel</Button>
+          <Button onClick={() => this.handleCloseEditor(true)}>Save</Button>
+        </DialogActions>
+      </Dialog>
       </div>
     );
   }
